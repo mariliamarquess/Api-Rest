@@ -32,35 +32,33 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getById = exports.getByIdValidation = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const yup = __importStar(require("yup"));
+const cidades_1 = require("../../database/providers/cidades");
 const middlewares_1 = require("../../shared/middlewares");
 exports.getByIdValidation = (0, middlewares_1.validation)(getSchema => ({
     params: getSchema(yup.object().shape({
         id: yup.number().integer().required().moreThan(0),
     })),
 }));
-const getById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (Number(req.params.id) === 99999)
-        return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+const getById = async (req, res) => {
+    if (!req.params.id) {
+        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
             errors: {
-                default: 'Registro não encontrado'
+                default: 'O parâmetro "id" precisa ser informado.'
             }
         });
-    return res.status(http_status_codes_1.StatusCodes.OK).json({
-        id: req.params.id,
-        nome: 'Caxias do Sul',
-    });
-});
+    }
+    const result = await cidades_1.CidadesProvider.getById(req.params.id);
+    if (result instanceof Error) {
+        return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+            errors: {
+                default: result.message
+            }
+        });
+    }
+    return res.status(http_status_codes_1.StatusCodes.OK).json(result);
+};
 exports.getById = getById;

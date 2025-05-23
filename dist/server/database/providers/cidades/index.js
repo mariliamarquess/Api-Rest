@@ -33,35 +33,11 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateById = exports.updateByIdValidation = void 0;
-const http_status_codes_1 = require("http-status-codes");
-const yup = __importStar(require("yup"));
-const cidades_1 = require("../../database/providers/cidades");
-const middlewares_1 = require("../../shared/middlewares");
-exports.updateByIdValidation = (0, middlewares_1.validation)(getSchema => ({
-    body: getSchema(yup.object().shape({
-        nome: yup.string().required().min(3),
-    })),
-    params: getSchema(yup.object().shape({
-        id: yup.number().integer().required().moreThan(0),
-    })),
-}));
-const updateById = async (req, res) => {
-    if (!req.params.id) {
-        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
-            errors: {
-                default: 'O parâmetro "id" precisa ser informado.'
-            }
-        });
-    }
-    const result = await cidades_1.CidadesProvider.updateById(req.params.id, req.body);
-    if (result instanceof Error) {
-        return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-            errors: {
-                default: result.message
-            }
-        });
-    }
-    return res.status(http_status_codes_1.StatusCodes.NO_CONTENT).json(result);
-};
-exports.updateById = updateById;
+exports.CidadesProvider = void 0;
+const deleteById = __importStar(require("./DeleteById"));
+const updateById = __importStar(require("./UpdateById"));
+const getById = __importStar(require("./GetById"));
+const create = __importStar(require("./Create"));
+const getAll = __importStar(require("./GetAll"));
+const count = __importStar(require("./Count"));
+exports.CidadesProvider = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, deleteById), updateById), getById), create), getAll), count);
