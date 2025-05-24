@@ -10,7 +10,7 @@ const router = Router();
 
 
 router.get('/', (req, res) => {
-  return res.send('Hello World!')
+  res.send('Hello World!')
 });
 
 router.get('/cidades',CidadesController.getAllValidation,CidadesController.getAll); // trazer alguma coisa do backend

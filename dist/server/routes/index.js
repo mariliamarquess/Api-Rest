@@ -6,7 +6,7 @@ const controllers_1 = require("./../controllers");
 const router = (0, express_1.Router)();
 exports.router = router;
 router.get('/', (req, res) => {
-    return res.send('Hello World!');
+    res.send('Hello World!');
 });
 router.get('/cidades', controllers_1.CidadesController.getAllValidation, controllers_1.CidadesController.getAll); // trazer alguma coisa do backend
 router.post('/cidades', controllers_1.CidadesController.createValidation, controllers_1.CidadesController.create); // criar algo novo

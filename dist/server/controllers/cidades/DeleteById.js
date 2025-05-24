@@ -32,33 +32,44 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteById = exports.deleteByIdValidation = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const yup = __importStar(require("yup"));
 const cidades_1 = require("../../database/providers/cidades");
 const middlewares_1 = require("../../shared/middlewares");
-exports.deleteByIdValidation = (0, middlewares_1.validation)(getSchema => ({
+exports.deleteByIdValidation = (0, middlewares_1.validation)((getSchema) => ({
     params: getSchema(yup.object().shape({
         id: yup.number().integer().required().moreThan(0),
     })),
 }));
-const deleteById = async (req, res) => {
+const deleteById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.params.id) {
-        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
             errors: {
                 default: 'O parâmetro "id" precisa ser informado.'
             }
         });
+        return;
     }
-    const result = await cidades_1.CidadesProvider.deleteById(req.params.id);
+    const result = yield cidades_1.CidadesProvider.deleteById(req.params.id);
     if (result instanceof Error) {
-        return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+        res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
             errors: {
                 default: result.message
             }
         });
+        return;
     }
-    return res.status(http_status_codes_1.StatusCodes.NO_CONTENT).send();
-};
+    res.status(http_status_codes_1.StatusCodes.NO_CONTENT).send();
+});
 exports.deleteById = deleteById;

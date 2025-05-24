@@ -32,6 +32,15 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateById = exports.updateByIdValidation = void 0;
 const http_status_codes_1 = require("http-status-codes");
@@ -46,22 +55,24 @@ exports.updateByIdValidation = (0, middlewares_1.validation)(getSchema => ({
         id: yup.number().integer().required().moreThan(0),
     })),
 }));
-const updateById = async (req, res) => {
+const updateById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.params.id) {
-        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
             errors: {
                 default: 'O parâmetro "id" precisa ser informado.'
             }
         });
+        return;
     }
-    const result = await cidades_1.CidadesProvider.updateById(req.params.id, req.body);
+    const result = yield cidades_1.CidadesProvider.updateById(req.params.id, req.body);
     if (result instanceof Error) {
-        return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+        res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
             errors: {
                 default: result.message
             }
         });
+        return;
     }
-    return res.status(http_status_codes_1.StatusCodes.NO_CONTENT).json(result);
-};
+    res.status(http_status_codes_1.StatusCodes.NO_CONTENT).json(result);
+});
 exports.updateById = updateById;

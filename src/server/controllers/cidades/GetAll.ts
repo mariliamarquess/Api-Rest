@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import * as yup from 'yup';
 
@@ -12,13 +12,15 @@ interface IQueryProps {
   limit?: number;
   filter?: string;
 }
-export const getAllValidation = validation((getSchema) => ({
-  query: getSchema<IQueryProps>(yup.object().shape({
-    page: yup.number().optional().moreThan(0),
-    limit: yup.number().optional().moreThan(0),
-    id: yup.number().integer().optional().default(0),
-    filter: yup.string().optional(),
-  })),
+export const getAllValidation: RequestHandler = validation((getSchema) => ({
+  query: getSchema<IQueryProps>(
+    yup.object().shape({
+      page: yup.number().optional().moreThan(0),
+      limit: yup.number().optional().moreThan(0),
+      id: yup.number().integer().optional().default(0),
+      filter: yup.string().optional(),
+    })
+  ),
 }));
 
 export const getAll = async (req: Request<{}, {}, {}, IQueryProps>, res: Response) => {
@@ -26,17 +28,20 @@ export const getAll = async (req: Request<{}, {}, {}, IQueryProps>, res: Respons
   const count = await CidadesProvider.count(req.query.filter);
 
   if (result instanceof Error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       errors: { default: result.message }
     });
-  } else if (count instanceof Error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+
+   return;
+  } else if (count instanceof Error) { res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       errors: { default: count.message }
     });
-  }
 
+    return;
+  }
+  
   res.setHeader('access-control-expose-headers', 'x-total-count');
   res.setHeader('x-total-count', count);
 
-  return res.status(StatusCodes.OK).json(result);
+  res.status(StatusCodes.OK).json(result);
 };

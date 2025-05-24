@@ -8,24 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.create = void 0;
-const ETableNames_1 = require("../../ETableNames");
-const knex_1 = require("../../knex");
-const create = (cidade) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const [result] = yield (0, knex_1.Knex)(ETableNames_1.ETableNames.cidade).insert(cidade).returning('id');
-        if (typeof result === 'object') {
-            return result.id;
-        }
-        else if (typeof result === 'number') {
-            return result;
-        }
-        return new Error('Erro ao cadastrar o registro');
-    }
-    catch (error) {
-        console.log(error);
-        return Error('Erro ao cadastrar o registro');
-    }
-});
-exports.create = create;
+exports.testServer = void 0;
+const supertest_1 = __importDefault(require("supertest"));
+const Server_1 = require("../src/server/Server");
+const knex_1 = require("../src/server/database/knex");
+beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield knex_1.Knex.migrate.latest();
+}));
+afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield knex_1.Knex.destroy();
+}));
+exports.testServer = (0, supertest_1.default)(Server_1.server);
