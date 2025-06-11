@@ -3,14 +3,20 @@ import { server } from './server/Server';
 
 const startServer = () => {
   server.listen(process.env.PORT || 3333, () => {
-    console.log(`Server is running on port ${process.env.PORT || 3333}`);
+    console.log(`App rodando na porta ${process.env.PORT || 3333}`);
   });
 };
 
+
 if (process.env.IS_LOCALHOST !== 'true') {
-  Knex.migrate.latest()
+  console.log('Rodando migrations');
+
+  Knex.migrate
+    .latest()
     .then(() => {
-      startServer();
+      Knex.seed.run()
+        .then(() => startServer())
+        .catch(console.log);
     })
     .catch(console.log);
 } else {
