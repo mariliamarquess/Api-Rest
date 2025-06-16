@@ -40,7 +40,7 @@ export const production: Knex.Config = {
     user: process.env.DATABASE_USER,
     database: process.env.DATABASE_NAME,
     password: process.env.DATABASE_PASSWORD,
-    port: Number(process.env.DATABASE_PORT || 5432),
+    port: Number(process.env.DATABASE_PORT),
     ssl: { rejectUnauthorized: false },
   },
 };
