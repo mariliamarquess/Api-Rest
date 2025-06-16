@@ -42,36 +42,49 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAll = exports.getAllValidation = void 0;
+exports.signIn = exports.signInValidation = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const yup = __importStar(require("yup"));
-const cidades_1 = require("../../database/providers/cidades");
+const usuarios_1 = require("../../database/providers/usuarios");
+const services_1 = require("../../shared/services");
 const middlewares_1 = require("../../shared/middlewares");
-exports.getAllValidation = (0, middlewares_1.validation)((getSchema) => ({
-    query: getSchema(yup.object().shape({
-        page: yup.number().optional().moreThan(0),
-        limit: yup.number().optional().moreThan(0),
-        id: yup.number().integer().optional().default(0),
-        filter: yup.string().optional(),
+exports.signInValidation = (0, middlewares_1.validation)((getSchema) => ({
+    body: getSchema(yup.object().shape({
+        senha: yup.string().required().min(6),
+        email: yup.string().required().email().min(5),
     })),
 }));
-const getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield cidades_1.CidadesProvider.getAll(req.query.page || 1, req.query.limit || 7, req.query.filter || '', Number(req.query.id || 0));
-    const count = yield cidades_1.CidadesProvider.count(req.query.filter);
-    if (result instanceof Error) {
-        res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-            errors: { default: result.message }
+const signIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, senha } = req.body;
+    const usuario = yield usuarios_1.UsuariosProvider.getByEmail(email);
+    if (usuario instanceof Error) {
+        res.status(http_status_codes_1.StatusCodes.UNAUTHORIZED).json({
+            errors: {
+                default: 'Email ou senha são inválidos'
+            }
         });
         return;
     }
-    else if (count instanceof Error) {
-        res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-            errors: { default: count.message }
+    const passwordMatch = yield services_1.PasswordCrypto.verifyPassword(senha, usuario.senha);
+    if (!passwordMatch) {
+        res.status(http_status_codes_1.StatusCodes.UNAUTHORIZED).json({
+            errors: {
+                default: 'Email ou senha são inválidos'
+            }
         });
         return;
     }
-    res.setHeader('access-control-expose-headers', 'x-total-count');
-    res.setHeader('x-total-count', count);
-    res.status(http_status_codes_1.StatusCodes.OK).json(result);
+    else {
+        const accessToken = services_1.JWTService.sign({ uid: usuario.id });
+        if (accessToken === 'JWT_SECRET_NOT_FOUND') {
+            res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+                errors: {
+                    default: 'Erro ao gerar o token de acesso'
+                }
+            });
+            return;
+        }
+        res.status(http_status_codes_1.StatusCodes.OK).json({ accessToken });
+    }
 });
-exports.getAll = getAll;
+exports.signIn = signIn;

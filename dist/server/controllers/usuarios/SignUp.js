@@ -42,36 +42,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAll = exports.getAllValidation = void 0;
-const http_status_codes_1 = require("http-status-codes");
+exports.signUp = exports.signUpValidation = void 0;
 const yup = __importStar(require("yup"));
-const cidades_1 = require("../../database/providers/cidades");
 const middlewares_1 = require("../../shared/middlewares");
-exports.getAllValidation = (0, middlewares_1.validation)((getSchema) => ({
-    query: getSchema(yup.object().shape({
-        page: yup.number().optional().moreThan(0),
-        limit: yup.number().optional().moreThan(0),
-        id: yup.number().integer().optional().default(0),
-        filter: yup.string().optional(),
+const http_status_codes_1 = require("http-status-codes");
+const usuarios_1 = require("../../database/providers/usuarios");
+exports.signUpValidation = (0, middlewares_1.validation)((getSchema) => ({
+    body: getSchema(yup.object().shape({
+        nome: yup.string().required().min(3),
+        email: yup.string().required().email().min(5),
+        senha: yup.string().required().min(6),
     })),
 }));
-const getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield cidades_1.CidadesProvider.getAll(req.query.page || 1, req.query.limit || 7, req.query.filter || '', Number(req.query.id || 0));
-    const count = yield cidades_1.CidadesProvider.count(req.query.filter);
+const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield usuarios_1.UsuariosProvider.create(req.body);
     if (result instanceof Error) {
         res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-            errors: { default: result.message }
+            errors: {
+                default: result.message
+            }
         });
         return;
     }
-    else if (count instanceof Error) {
-        res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-            errors: { default: count.message }
-        });
-        return;
-    }
-    res.setHeader('access-control-expose-headers', 'x-total-count');
-    res.setHeader('x-total-count', count);
-    res.status(http_status_codes_1.StatusCodes.OK).json(result);
+    res.status(http_status_codes_1.StatusCodes.CREATED).json(result);
 });
-exports.getAll = getAll;
+exports.signUp = signUp;

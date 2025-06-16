@@ -45,19 +45,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAll = exports.getAllValidation = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const yup = __importStar(require("yup"));
-const cidades_1 = require("../../database/providers/cidades");
+const pessoas_1 = require("./../../database/providers/pessoas");
 const middlewares_1 = require("../../shared/middlewares");
-exports.getAllValidation = (0, middlewares_1.validation)((getSchema) => ({
-    query: getSchema(yup.object().shape({
-        page: yup.number().optional().moreThan(0),
-        limit: yup.number().optional().moreThan(0),
-        id: yup.number().integer().optional().default(0),
-        filter: yup.string().optional(),
+exports.getAllValidation = (0, middlewares_1.validation)(get => ({
+    query: get(yup.object().shape({
+        filter: yup.string().optional().default(''),
+        page: yup.number().integer().optional().moreThan(0).default(1),
+        limit: yup.number().integer().optional().moreThan(0).default(7),
     })),
 }));
 const getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield cidades_1.CidadesProvider.getAll(req.query.page || 1, req.query.limit || 7, req.query.filter || '', Number(req.query.id || 0));
-    const count = yield cidades_1.CidadesProvider.count(req.query.filter);
+    const query = req.query;
+    const result = yield pessoas_1.PessoasProvider.getAll(query.page || 1, query.limit || 7, query.filter || '');
+    const count = yield pessoas_1.PessoasProvider.count(query.filter);
     if (result instanceof Error) {
         res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
             errors: { default: result.message }
