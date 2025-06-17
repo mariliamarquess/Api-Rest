@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+require("dotenv/config");
 const knex_1 = require("./server/database/knex");
 const Server_1 = require("./server/Server");
 const startServer = () => {

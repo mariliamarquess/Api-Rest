@@ -3,7 +3,6 @@ import pg from 'pg';
 import 'dotenv/config';
 import path from "path";
 
-
 if (process.env.NODE_ENV === "production") {
   pg.types.setTypeParser(20, "text", parseInt);
 }
