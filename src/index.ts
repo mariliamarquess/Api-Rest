@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Knex } from './server/database/knex';
 import { server } from './server/Server';
 
