@@ -1,13 +1,17 @@
+import dotenv from 'dotenv';
+import path from "path";
+console.log(path.resolve(__dirname, "../../../../.env"))
+dotenv.config({
+	path: path.resolve(__dirname, "../../../../.env")
+})
+
 import { knex } from "knex";
 import pg from 'pg';
-import 'dotenv/config';
-import path from "path";
 
 if (process.env.NODE_ENV === "production") {
   pg.types.setTypeParser(20, "text", parseInt);
 }
-
-export const Knex = knex({
+  const Knex = knex({
   client: "pg",
   migrations: {
     directory: path.resolve(__dirname, "..", "migrations"),
@@ -24,3 +28,5 @@ export const Knex = knex({
     ssl: { rejectUnauthorized: false },
   },
 });
+console.log(__dirname);
+export default Knex;
