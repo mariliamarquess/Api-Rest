@@ -1,6 +1,7 @@
 import { ICidade } from "../../models";
 import { ETableNames } from "../../ETableNames";
-import { Knex } from "../../knex";
+import Knex from 'knex';
+
 
 
 

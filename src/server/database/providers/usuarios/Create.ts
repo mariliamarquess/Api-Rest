@@ -1,7 +1,7 @@
 import { IUsuario } from "../../models";
 import { ETableNames } from "../../ETableNames";
-import { Knex } from "../../knex";
 import { PasswordCrypto } from "../../../shared/services";
+import Knex  from "knex";
 
 
 
